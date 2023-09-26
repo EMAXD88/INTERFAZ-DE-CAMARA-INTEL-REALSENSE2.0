@@ -51,12 +51,14 @@ def show_image_preview(color_img, depth_img):
     color_image = color_img
     depth_image = depth_img
 
+    # Convierte la imagen de BGR a RGB
+    color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+
     image_preview = tk.Toplevel(root)
     image_preview.title("Vista Previa de la Imagen")
 
     # Muestra la imagen en color
-    color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
-    color_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(color_image, (600, 400))))
+    color_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(color_image_rgb, (600, 400))))
     color_label = tk.Label(image_preview, image=color_photo)
     color_label.image = color_photo
     color_label.pack(side=tk.LEFT)
@@ -126,7 +128,7 @@ def save_image(name, date_str):
 
     # Crear subcarpeta para el día actual si no existe
     current_date = datetime.datetime.now().strftime("%Y%m%d")
-    folder_name = os.path.join("CapturasIntelRealSense", current_date)
+    folder_name = os.path.join("CapturasDeFotos", current_date)
     os.makedirs(folder_name, exist_ok=True)
 
     # Crear subcarpetas para las imágenes RGB, de profundidad y .npy
@@ -173,8 +175,8 @@ def update_camera_frame():
 
         if color_frame and depth_frame:
             color_image = np.asanyarray(color_frame.get_data())
-            color_image = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
-            color_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(color_image, (600, 400))))
+            color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
+            color_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(color_image_rgb, (600, 400))))
             label_color.config(image=color_photo)
             label_color.image = color_photo
 
