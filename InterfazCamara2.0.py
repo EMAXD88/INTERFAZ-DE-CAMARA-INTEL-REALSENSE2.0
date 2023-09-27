@@ -212,7 +212,7 @@ def update_camera_frame():
             label_depth.image = depth_photo
 
     root.after(60, update_camera_frame)  # Ajustamos el retraso a 30 ms para mejorar el rendimiento
-
+#siiiuuu
 # Creación de la ventana principal de la interfaz
 root = tk.Tk()
 root.title("INTERFAZ DE LA CAMARA")
