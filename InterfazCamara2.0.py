@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox, ttk
-from tkcalendar import Calendar  # Importamos el widget de calendario
+from tkcalendar import Calendar
 import cv2
 import time
 import os
@@ -55,7 +55,7 @@ def show_image_preview(color_img, depth_img):
     color_image_rgb = cv2.cvtColor(color_image, cv2.COLOR_BGR2RGB)
 
     image_preview = tk.Toplevel(root)
-    image_preview.title("Vista Previa de la Imagen")
+    image_preview.title("Vista Previa de la Imagen Tomada")
 
     # Muestra la imagen en color
     color_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(color_image_rgb, (600, 400))))
@@ -65,7 +65,7 @@ def show_image_preview(color_img, depth_img):
 
     # Muestra la imagen de profundidad
     depth_image_rectified = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-    depth_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(depth_image_rectified*8, (600, 400))))
+    depth_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(depth_image_rectified*6, (600, 400))))
     depth_label = tk.Label(image_preview, image=depth_photo)
     depth_label.image = depth_photo
     depth_label.pack(side=tk.LEFT)
@@ -77,7 +77,7 @@ def show_image_preview(color_img, depth_img):
     name_entry.pack()
 
     # Crear widget de calendario para seleccionar la fecha
-    date_label = tk.Label(image_preview, text="Fecha (opcional):")
+    date_label = tk.Label(image_preview, text="Fecha:")
     date_label.pack()
     date_calendar = Calendar(image_preview, date_pattern="yyyy-mm-dd")
     date_calendar.pack()
@@ -110,6 +110,10 @@ def take_photo():
     # Muestra la vista previa de la imagen
     show_image_preview(color_image, depth_image)
 
+# Función para verificar si el archivo ya existe
+def image_exists(image_path):
+    return os.path.isfile(image_path)
+
 # Función para guardar la imagen con el nombre y la fecha proporcionados
 def save_image(name, date_str):
     global image_counter, image_preview
@@ -124,7 +128,8 @@ def save_image(name, date_str):
     date = datetime.datetime.strptime(date_str, "%Y-%m-%d")
 
     # Cierra la ventana de vista previa
-    image_preview.destroy()
+    if image_preview:
+        image_preview.destroy()
 
     # Crear subcarpeta para el día actual si no existe
     current_date = datetime.datetime.now().strftime("%Y%m%d")
@@ -150,6 +155,26 @@ def save_image(name, date_str):
     npy_rgb_image_path = os.path.join(npy_rgb_folder, f"{image_name}_rgb.npy")
     npy_depth_image_path = os.path.join(npy_depth_folder, f"{image_name}_profundidad.npy")
     
+    # Verificar si el archivo ya existe
+    while (
+        image_exists(rgb_image_path) or
+        image_exists(depth_image_path) or
+        image_exists(npy_rgb_image_path) or
+        image_exists(npy_depth_image_path)
+    ):
+        confirm = messagebox.askyesno("Archivo Existente", "Este archivo ya existe. ¿Deseas sobrescribirlo?")
+        if confirm:
+            # Si se confirma la sobrescritura, eliminar el archivo existente
+            os.remove(rgb_image_path)
+            os.remove(depth_image_path)
+            os.remove(npy_rgb_image_path)
+            os.remove(npy_depth_image_path)
+            break
+        else:
+            # Mostrar la ventana de vista previa nuevamente
+            show_image_preview(color_image, depth_image)
+            return
+
     cv2.imwrite(rgb_image_path, color_image)
     cv2.imwrite(depth_image_path, depth_image)
     np.save(npy_rgb_image_path, color_image)
