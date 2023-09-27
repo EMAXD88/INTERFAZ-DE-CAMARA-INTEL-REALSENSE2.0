@@ -65,7 +65,7 @@ def show_image_preview(color_img, depth_img):
 
     # Muestra la imagen de profundidad
     depth_image_rectified = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-    depth_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(depth_image_rectified*4, (600, 400))))
+    depth_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(depth_image_rectified*8, (600, 400))))
     depth_label = tk.Label(image_preview, image=depth_photo)
     depth_label.image = depth_photo
     depth_label.pack(side=tk.LEFT)
@@ -182,7 +182,7 @@ def update_camera_frame():
 
             depth_image = np.asanyarray(depth_frame.get_data())
             depth_image_rectified = cv2.normalize(depth_image, None, 0, 255, cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-            depth_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(depth_image_rectified*4, (600, 400))))
+            depth_photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.resize(depth_image_rectified, (600, 400))))
             label_depth.config(image=depth_photo)
             label_depth.image = depth_photo
 
